@@ -10,41 +10,50 @@ class GameGraphics:
         self.win = GraphWin("Cannon game" , 640, 480, autoflush=False)
         self.win.setCoords(-110, -10, 110, 155)
         
-        # draw the terrain
-        # TODO: Draw a line from (-110,0) to (110,0)
+        Line(Point(-110,0), Point(110,0)).draw(self.win)
 
         self.draw_cannons = [self.drawCanon(0), self.drawCanon(1)]
         self.draw_scores  = [self.drawScore(0), self.drawScore(1)]
         self.draw_projs   = [None, None]
 
     def drawCanon(self,playerNr):
+        player = self.game.getPlayers()[playerNr]
+        playerCannon = Rectangle(Point(player.getX() - player.game.getCannonSize()/2, 0), Point(player.getX() + player.game.getCannonSize()/2, player.game.getCannonSize()))
+
+        playerCannon.setFill(player.getColor())
+        playerCannon.draw(self.win)
         # draw the cannon
         # TODO: draw a square with the size of the cannon with the color
         # and the position of the player with number playerNr.
         # After the drawing, return the rectangle object.
-        return None
+        return playerCannon
 
     def drawScore(self,playerNr):
+        player = self.game.getPlayers()[playerNr]
+        scoreText = Text(Point(player.getX(), -5), "Score: " + str(player.getScore()))
+        scoreText.setSize(15)
+        scoreText.draw(self.win)
         # draw the score
         # TODO: draw the text "Score: X", where X is the number of points
         # for player number playerNr. The text should be placed under
         # the corresponding cannon. After the drawing,
         # return the text object.
-        return None
+        return scoreText
 
     def fire(self, angle, vel):
         player = self.game.getCurrentPlayer()
         proj = player.fire(angle, vel)
+        circle = self.draw_projs[self.game.getCurrentPlayerNumber()]
 
         circle_X = proj.getX()
         circle_Y = proj.getY()
-
-        # TODO: If the circle for the projectile for the current player
-        # is not None, undraw it!
-
-        # draw the projectile (ball/circle)
-        # TODO: Create and draw a new circle with the coordinates of
-        # the projectile.
+       
+        if circle is not None:
+            circle.undraw()
+        
+        circle = Circle(Point(proj.getX(), proj.getY()), self.game.getBallSize())
+        circle.setFill(player.getColor())
+        circle.draw(self.win)
 
         while proj.isMoving():
             proj.update(1/50)
@@ -57,15 +66,16 @@ class GameGraphics:
 
             update(50)
 
+        self.draw_projs[self.game.getCurrentPlayerNumber()] = circle
         return proj
 
     def updateScore(self,playerNr):
-        # update the score on the screen
-        # TODO: undraw the old text, create and draw a new text
-        pass
+        self.draw_scores[playerNr].undraw()
+        self.draw_scores[playerNr] = self.drawScore(playerNr)
 
     def play(self):
         while True:
+            
             player = self.game.getCurrentPlayer()
             oldAngle,oldVel = player.getAim()
             wind = self.game.getCurrentWind()
@@ -86,10 +96,28 @@ class GameGraphics:
 
             if distance == 0.0:
                 player.increaseScore()
+                self.explode()
                 self.updateScore(self.game.getCurrentPlayerNumber())
                 self.game.newRound()
 
             self.game.nextPlayer()
+
+    def explode(self):
+        circleRadius = self.game.getBallSize()
+        circle = None
+
+        while circleRadius < 2 * self.game.getCannonSize():
+            if circle is not None:
+                circle.undraw()
+
+            circle = Circle(Point(self.game.getOtherPlayer().getX(), 0), circleRadius)
+            circle.setFill(self.game.getCurrentPlayer().getColor())
+            circle.draw(self.win)
+
+            circleRadius += 1
+            update(50)
+        
+        circle.undraw()
 
 
 class InputDialog:
