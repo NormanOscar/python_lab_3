@@ -9,7 +9,7 @@ class Game:
         self.ballSize = ballSize
         self.players = [Player(self, False, -90, "blue"), Player(self, True, 90, "red")]
         self.currentPlayer = 0
-        self.currentWind = random.random() * 20 - 10
+        self.currentWind = random.randint(-10, 10)
 
     """ A list containing both players """
     def getPlayers(self):
@@ -49,8 +49,7 @@ class Game:
 
     """ Start a new round with a random wind value (-10 to +10) """
     def newRound(self):
-        num = random.random()
-        self.currentWind = num * 20 - 10
+        self.currentWind = random.randint(-10, 10)
 
 """ Models a player """
 class Player:
