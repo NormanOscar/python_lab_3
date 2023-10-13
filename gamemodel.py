@@ -66,6 +66,7 @@ class Player:
     """ Create and return a projectile starting at the centre of this players cannon. Replaces any previous projectile for this player. """
     def fire(self, angle, velocity):
         projAngle = angle
+        # If the player is reversed, the angle needs to be reversed
         if self.isReversed:
             projAngle = 180 - angle
             
@@ -83,22 +84,20 @@ class Player:
         ballLeft = ballCenter - self.game.getBallSize()
         ballRight = ballCenter + self.game.getBallSize()
 
+        # If the projectile is to the left of the cannon
         if ballCenter < cannonLeft:
+            # If the projectile is touching the cannon else return the distance
             if ballRight > cannonLeft:
                 return 0
             else:
                 return ballRight - cannonLeft
-
+        # If the projectile is to the right of the cannon
         else:
+            # If the projectile is touching the cannon else return the distance
             if ballLeft < cannonRight:
                 return 0
             else:
                 return ballLeft - cannonRight
-
-        # HINT: both self (a Player) and proj (a Projectile) have getX()-methods.
-        # HINT: This method should give a negative value if the projectile missed to the left and positive if it missed to the right.
-        # The distance should be how far the projectile and cannon are from touching, not the distance between their centers.
-        # You probably need to use getCannonSize and getBallSize from Game to compensate for the size of cannons/cannonballs
 
     """ The current score of this player """
     def getScore(self):
@@ -120,8 +119,6 @@ class Player:
     def getAim(self):
         return (self.angle, self.velocity)
 
-
-
 """ Models a projectile (a cannonball, but could be used more generally) """
 class Projectile:
     """
@@ -141,7 +138,6 @@ class Projectile:
         self.xvel = velocity*cos(theta)
         self.yvel = velocity*sin(theta)
         self.wind = wind
-
 
     """ 
         Advance time by a given number of seconds
@@ -171,7 +167,7 @@ class Projectile:
     """ A projectile is moving as long as it has not hit the ground or moved outside the xLower and xUpper limits """
     def isMoving(self):
         return 0 < self.getY() and self.xLower < self.getX() < self.xUpper
-
+    
     def getX(self):
         return self.xPos
 
