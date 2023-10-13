@@ -107,18 +107,13 @@ class GameGraphics:
         circle = None
 
         while circleRadius < 2 * self.game.getCannonSize():
-            if circle is not None:
-                circle.undraw()
-
             circle = Circle(Point(self.game.getOtherPlayer().getX(), 0), circleRadius)
             circle.setFill(self.game.getCurrentPlayer().getColor())
             circle.draw(self.win)
 
             circleRadius += 1
             update(50)
-        
-        circle.undraw()
-
+            circle.undraw()
 
 class InputDialog:
     def __init__ (self, angle, vel, wind):
